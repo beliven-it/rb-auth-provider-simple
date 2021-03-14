@@ -1,0 +1,36 @@
+{
+  "name": "rb-auth-provider-simple",
+  "version": "0.1.0",
+  "description": "A Restboard auth provider accepting email & password",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "tap"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/restboard/rb-auth-provider-simple.git"
+  },
+  "keywords": [
+    "REST",
+    "JSON",
+    "auth",
+    "provider",
+    "simple",
+    "restboard"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/restboard/rb-auth-provider-simple/issues"
+  },
+  "homepage": "https://github.com/restboard/rb-auth-provider-simple#readme",
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  },
+  "peerDependencies": {
+    "rb-core-module": "^0.5.0"
+  },
+  "devDependencies": {
+    "tap": "^14.11.0"
+  }
+}
