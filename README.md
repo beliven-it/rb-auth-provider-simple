@@ -55,12 +55,14 @@ const authProvider = simpleAuthProvider('https://my.api.url/auth', {
 })
 ```
 
-| Name         | Description                                             |
-|--------------|---------------------------------------------------------|
-| `jwtKey`     | The key used to store the user JWT into cache storage   |
-| `identifier` | A function returning the `user` string representation   |
-| `acl`        | A function checking if`user` is allowed to visit `route`|
-| `storage`    | An object with `local` and `session` storage instances  |
+
+| Name         | Description                                                    |
+|--------------|----------------------------------------------------------------|
+| `jwtCacheKey`| The key used to store the user JWT into cache storage          |
+| `identifier` | A function returning the `user` string representation          |
+| `acl`        | A function checking if`user` is allowed to visit `route`       |
+| `storage`    | An object with `local` and `session` storage instances         |
+| `timeout`    | The timeout (ms) used for each HTTP request (*Default: 5000*)  |
 
 ## Test
 

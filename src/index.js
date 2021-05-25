@@ -3,36 +3,39 @@ import { RbAuthProvider, errors } from "rb-core-module";
 
 class RbSimpleAuthProvider extends RbAuthProvider {
   constructor(authURL, {
-    jwtKey = 'rb-auth-jwt',
+    jwtCacheKey = 'rb-auth-jwt',
     identifier = null,
     acl = null,
     storage = {
       local: null,
       session: null
     },
+    timeout = 5000
   } = {}) {
     super();
     this.authURL = authURL;
-    this.jwtKey = jwtKey;
+    this.jwtCacheKey = jwtCacheKey;
     this.identifier = identifier;
     this.acl = acl;
     this.localStorage = storage.local;
     this.sessionStorage = storage.session;
+    this.timeout = timeout
   }
 
   async login({ email, password, keepLogged = false }) {
     const res = await fetch(this.authURL, {
       method: "POST",
+      timeout: this.timeout,
       body: JSON.stringify({ email, password })
     });
     if (!res.ok) {
       throw new Error(res.statusText);
     }
-    const { user, jwt } = await res.json()
+    const { user, token } = await res.json()
     if (keepLogged) {
-      this.localStorage && this.localStorage.setItem(this.jwtKey, jwt)
+      this.localStorage && this.localStorage.setItem(this.jwtCacheKey, token)
     } else {
-      this.sessionStorage && this.sessionStorage.setItem(this.jwtKey, jwt)
+      this.sessionStorage && this.sessionStorage.setItem(this.jwtCacheKey, token)
     }
     return {
       data: user,
@@ -40,14 +43,14 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 
   async logout() {
-    this.sessionStorage && this.sessionStorage.removeItem(this.jwtKey)
-    this.localStorage && this.localStorage.removeItem(this.jwtKey)
+    this.sessionStorage && this.sessionStorage.removeItem(this.jwtCacheKey)
+    this.localStorage && this.localStorage.removeItem(this.jwtCacheKey)
   }
 
   async checkAuth() {
-    let jwt = this.localStorage && this.localStorage.getItem(this.jwtKey)
+    let jwt = this.localStorage && this.localStorage.getItem(this.jwtCacheKey)
     if (!jwt) {
-      jwt = this.sessionStorage && this.sessionStorage.getItem(this.jwtKey)
+      jwt = this.sessionStorage && this.sessionStorage.getItem(this.jwtCacheKey)
     }
     if (!jwt) {
       throw new Error(errors.ERR_UNAUTHORIZED)
