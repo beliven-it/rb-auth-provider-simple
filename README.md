@@ -55,16 +55,17 @@ const authProvider = simpleAuthProvider('https://my.api.url/auth', {
 })
 ```
 
-| Name           | Description                                                    | Default         |
-|----------------|----------------------------------------------------------------|-----------------|
-| `tokenCacheKey`| The key used to store the bearer token into the cache storage  | `rb-auth-token` |
-| `identifier`   | A function returning the `user` string representation          | null            |
-| `acl`          | A function checking if `user` is allowed to visit `route`      | null            |
-| `storage`      | An object with `local` and `session` storage instances         | {}              |
-| `timeout`      | The timeout (ms) for each single HTTP request attempt          | 5000            |
-| `retries`      | The number of attempts before failing                          | 3               |
-| `backoff`      | The incremental delay (ms) between request attempts            | 300             |
-| `client`       | The HTTP client used to perform the requests                   | `fetch`         |
+| Name               | Description                                                    | Default         |
+|--------------------|----------------------------------------------------------------|-----------------|
+| `tokenCacheKey`    | The key used to store the bearer token into the cache storage  | `rb-auth-token` |
+| `identifier`       | A function returning the `user` string representation          | null            |
+| `tenantIdentifier` | A function returning the `user`'s tenant string representation | null            |
+| `acl`              | A function checking if `user` is allowed to visit `route`      | null            |
+| `storage`          | An object with `local` and `session` storage instances         | {}              |
+| `timeout`          | The timeout (ms) for each single HTTP request attempt          | 5000            |
+| `retries`          | The number of attempts before failing                          | 3               |
+| `backoff`          | The incremental delay (ms) between request attempts            | 300             |
+| `client`           | The HTTP client used to perform the requests                   | `fetch`         |
 
 ## Test
 

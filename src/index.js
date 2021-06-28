@@ -5,6 +5,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   constructor(authURL, {
     tokenCacheKey = 'rb-auth-token',
     identifier = null,
+    tenantIdentifier = null,
     acl = null,
     storage = {
       local: null,
@@ -19,6 +20,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     this.authURL = authURL
     this.tokenCacheKey = tokenCacheKey
     this.identifier = identifier
+    this.tenantIdentifier = tenantIdentifier
     this.acl = acl
     this.localStorage = storage.local
     this.sessionStorage = storage.session
@@ -81,6 +83,13 @@ class RbSimpleAuthProvider extends RbAuthProvider {
       return this.identifier(user)
     }
     return user.email || ''
+  }
+
+  async getTenantIdentity(user = {}) {
+    if (this.tenantIdentifier) {
+      return this.tenantIdentifier(user)
+    }
+    return null
   }
 
   async can(user, route) {
