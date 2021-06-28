@@ -3,59 +3,77 @@ import { RbAuthProvider, errors } from "rb-core-module";
 
 class RbSimpleAuthProvider extends RbAuthProvider {
   constructor(authURL, {
-    jwtCacheKey = 'rb-auth-jwt',
+    tokenCacheKey = 'rb-auth-token',
     identifier = null,
     acl = null,
     storage = {
       local: null,
       session: null
     },
-    timeout = 5000
+    timeout = 5000,
+    retries = 3,
+    backoff = 300,
+    client = null
   } = {}) {
     super();
-    this.authURL = authURL;
-    this.jwtCacheKey = jwtCacheKey;
-    this.identifier = identifier;
-    this.acl = acl;
-    this.localStorage = storage.local;
-    this.sessionStorage = storage.session;
-    this.timeout = timeout
+    this.authURL = authURL
+    this.tokenCacheKey = tokenCacheKey
+    this.identifier = identifier
+    this.acl = acl
+    this.localStorage = storage.local
+    this.sessionStorage = storage.session
+    this.timeout = timeout || 5000
+    this.retries = retries || 3
+    this.backoff = backoff || 300
+    this.client = client || ((...args) => fetch(...args))
   }
 
   async login({ email, password, keepLogged = false }) {
-    const res = await fetch(this.authURL, {
-      method: "POST",
-      timeout: this.timeout,
+    const url = this.authURL
+    const { user, token } = await this._performRequest(url, {
+      method: 'POST',
       body: JSON.stringify({ email, password })
-    });
-    if (!res.ok) {
-      throw new Error(res.statusText);
-    }
-    const { user, token } = await res.json()
+    }, this.retries)
     if (keepLogged) {
-      this.localStorage && this.localStorage.setItem(this.jwtCacheKey, token)
+      this.localStorage && this.localStorage.setItem(this.tokenCacheKey, token)
     } else {
-      this.sessionStorage && this.sessionStorage.setItem(this.jwtCacheKey, token)
+      this.sessionStorage && this.sessionStorage.setItem(this.tokenCacheKey, token)
     }
     return {
-      data: user,
-    };
+      data: user
+    }
   }
 
   async logout() {
-    this.sessionStorage && this.sessionStorage.removeItem(this.jwtCacheKey)
-    this.localStorage && this.localStorage.removeItem(this.jwtCacheKey)
+    this.sessionStorage && this.sessionStorage.removeItem(this.tokenCacheKey)
+    this.localStorage && this.localStorage.removeItem(this.tokenCacheKey)
   }
 
   async checkAuth() {
-    let jwt = this.localStorage && this.localStorage.getItem(this.jwtCacheKey)
-    if (!jwt) {
-      jwt = this.sessionStorage && this.sessionStorage.getItem(this.jwtCacheKey)
+    const url = this.authURL
+    let currToken = this.localStorage && this.localStorage.getItem(this.tokenCacheKey)
+    const keepLogged = !!currToken
+    if (!currToken) {
+      currToken = this.sessionStorage && this.sessionStorage.getItem(this.tokenCacheKey)
     }
-    if (!jwt) {
+    if (!currToken) {
       throw new Error(errors.ERR_UNAUTHORIZED)
     }
-    return jwt
+    const { user, token } = await this._performRequest(url, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${currToken}`
+      },
+      body: '{}'
+    }, this.retries)
+    if (keepLogged) {
+      this.localStorage && this.localStorage.setItem(this.tokenCacheKey, token)
+    } else {
+      this.sessionStorage && this.sessionStorage.setItem(this.tokenCacheKey, token)
+    }
+    return {
+      data: user
+    }
   }
 
   async getIdentity(user = {}) {
@@ -78,6 +96,31 @@ class RbSimpleAuthProvider extends RbAuthProvider {
         throw new Error(errors.ERR_FORBIDDEN)
       }
     }
+  }
+
+  async _performRequest (url, options, retries, backoff) {
+    const _backoff = backoff || this.backoff
+    const res = await this.client(url, {
+      timeout: this.timeout,
+      ...options
+    })
+    if (!res.ok) {
+      if (retries > 1 && retryCodes.includes(res.status)) {
+        return new Promise((resolve, reject) => {
+          setTimeout(async () => {
+            try {
+              const res = await this._performRequest(url, options, retries - 1, _backoff * 2)
+              resolve(res)
+            } catch (err) {
+              reject(err)
+            }
+          }, _backoff)
+        })
+      } else {
+        throw new Error(res.statusText)
+      }
+    }
+    return res.json()
   }
 }
 
