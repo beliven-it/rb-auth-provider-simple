@@ -1,6 +1,8 @@
 import fetch from "node-fetch";
 import { RbAuthProvider, errors } from "rb-core-module";
 
+const retryCodes = [408, 500, 502, 503, 504, 522, 524]
+
 class RbSimpleAuthProvider extends RbAuthProvider {
   constructor(authURL, {
     tokenCacheKey = 'rb-auth-token',
