@@ -5,6 +5,8 @@ const retryCodes = [408, 500, 502, 503, 504, 522, 524]
 
 class RbSimpleAuthProvider extends RbAuthProvider {
   constructor(authURL, {
+    userKey = 'user',
+    tokenKey = 'token',
     tokenCacheKey = 'rb-auth-token',
     identifier = null,
     tenantIdentifier = null,
@@ -20,6 +22,8 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   } = {}) {
     super();
     this.authURL = authURL
+    this.userKey = userKey
+    this.tokenKey = tokenKey
     this.tokenCacheKey = tokenCacheKey
     this.identifier = identifier
     this.tenantIdentifier = tenantIdentifier
@@ -34,10 +38,12 @@ class RbSimpleAuthProvider extends RbAuthProvider {
 
   async login({ email, password, keepLogged = false }) {
     const url = this.authURL
-    const { user, token } = await this._performRequest(url, {
+    const res = await this._performRequest(url, {
       method: 'POST',
       body: JSON.stringify({ email, password })
     }, this.retries)
+    const user = res[this.userKey]
+    const token = res[this.tokenKey]
     if (keepLogged) {
       this.localStorage && this.localStorage.setItem(this.tokenCacheKey, token)
     } else {
@@ -63,13 +69,15 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     if (!currToken) {
       throw new Error(errors.ERR_UNAUTHORIZED)
     }
-    const { user, token } = await this._performRequest(url, {
+    const res = await this._performRequest(url, {
       method: 'POST',
       headers: {
         authorization: `Bearer ${currToken}`
       },
       body: '{}'
     }, this.retries)
+    const user = res[this.userKey]
+    const token = res[this.tokenKey]
     if (keepLogged) {
       this.localStorage && this.localStorage.setItem(this.tokenCacheKey, token)
     } else {
