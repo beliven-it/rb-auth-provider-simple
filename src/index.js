@@ -72,7 +72,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     const res = await this._performRequest(url, {
       method: 'POST',
       headers: {
-        authorization: `Bearer ${currToken}`
+        Authorization: `Bearer ${currToken}`
       },
       body: '{}'
     }, this.retries)
