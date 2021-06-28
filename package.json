@@ -1,6 +1,6 @@
 {
   "name": "rb-auth-provider-simple",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A Restboard auth provider supporting email/password or bearer token",
   "main": "src/index.js",
   "scripts": {
