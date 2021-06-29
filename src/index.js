@@ -87,7 +87,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
       timeout: this.timeout,
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8',
         ...options.headers
       }
     })
