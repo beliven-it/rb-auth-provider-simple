@@ -5,6 +5,7 @@ const retryCodes = [408, 500, 502, 503, 504, 522, 524]
 
 class RbSimpleAuthProvider extends RbAuthProvider {
   constructor(authURL, {
+    checkURL = null,
     userKey = 'user',
     tokenKey = 'token',
     tokenCacheKey = 'rb-auth-token',
@@ -22,6 +23,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   } = {}) {
     super();
     this.authURL = authURL
+    this.checkURL = checkURL || authURL
     this.userKey = userKey
     this.tokenKey = tokenKey
     this.tokenCacheKey = tokenCacheKey
@@ -37,21 +39,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 
   async login({ email, password, keepLogged = false }) {
-    const url = this.authURL
-    const res = await this._performRequest(url, {
-      method: 'POST',
-      body: JSON.stringify({ email, password })
-    }, this.retries)
-    const user = res[this.userKey]
-    const token = res[this.tokenKey]
-    if (keepLogged) {
-      this.localStorage && this.localStorage.setItem(this.tokenCacheKey, token)
-    } else {
-      this.sessionStorage && this.sessionStorage.setItem(this.tokenCacheKey, token)
-    }
-    return {
-      data: user
-    }
+    return this._performAuth(this.authURL, keepLogged, { email, password })
   }
 
   async logout() {
@@ -60,32 +48,8 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 
   async checkAuth() {
-    const url = this.authURL
-    let currToken = this.localStorage && this.localStorage.getItem(this.tokenCacheKey)
-    const keepLogged = !!currToken
-    if (!currToken) {
-      currToken = this.sessionStorage && this.sessionStorage.getItem(this.tokenCacheKey)
-    }
-    if (!currToken) {
-      throw new Error(errors.ERR_UNAUTHORIZED)
-    }
-    const res = await this._performRequest(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${currToken}`
-      },
-      body: '{}'
-    }, this.retries)
-    const user = res[this.userKey]
-    const token = res[this.tokenKey]
-    if (keepLogged) {
-      this.localStorage && this.localStorage.setItem(this.tokenCacheKey, token)
-    } else {
-      this.sessionStorage && this.sessionStorage.setItem(this.tokenCacheKey, token)
-    }
-    return {
-      data: user
-    }
+    const { token, keepLogged } = this._getTokenFromCache()
+    return this._performAuth(this.checkURL, keepLogged, token)
   }
 
   async getIdentity(user = {}) {
@@ -144,6 +108,45 @@ class RbSimpleAuthProvider extends RbAuthProvider {
       }
     }
     return res.json()
+  }
+
+  async _performAuth (url, keepLogged, tokenOrCredentials = null) {
+    if (!tokenOrCredentials) {
+      throw new Error(errors.ERR_UNAUTHORIZED)
+    }
+    const isBearerToken = (typeof tokenOrCredentials === 'string')
+    const headers = {
+      Authorization: isBearerToken ? `Bearer ${tokenOrCredentials}` : undefined
+    }
+    const body = !isBearerToken && tokenOrCredentials
+    const res = await this._performRequest(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body || {})
+    }, this.retries)
+    const user = res[this.userKey]
+    const token = res[this.tokenKey]
+    this._storeTokenToCache(token, keepLogged)
+    return {
+      data: user
+    }
+  }
+
+  _storeTokenToCache (token, keepLogged) {
+    if (keepLogged) {
+      this.localStorage && this.localStorage.setItem(this.tokenCacheKey, token)
+    } else {
+      this.sessionStorage && this.sessionStorage.setItem(this.tokenCacheKey, token)
+    }
+  }
+
+  _getTokenFromCache () {
+    let token = this.localStorage && this.localStorage.getItem(this.tokenCacheKey)
+    const keepLogged = !!token
+    if (!token) {
+      token = this.sessionStorage && this.sessionStorage.getItem(this.tokenCacheKey)
+    }
+    return { token, keepLogged }
   }
 }
 
