@@ -57,6 +57,7 @@ const authProvider = simpleAuthProvider('https://my.api.url/auth', {
 
 | Name               | Description                                                    | Default         |
 |--------------------|----------------------------------------------------------------|-----------------|
+| `checkURL`         | The (optional) URL used to check for active authentication     | null            |
 | `userKey`          | The key used to store the user details in the API response     | `user`          |
 | `tokenKey`         | The key used to store the token in the API response            | `token`         |
 | `tokenCacheKey`    | The key used to store the bearer token into the cache storage  | `rb-auth-token` |
