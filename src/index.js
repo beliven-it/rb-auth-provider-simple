@@ -1,6 +1,6 @@
-import fetch from "node-fetch";
 import { RbAuthProvider, errors } from "rb-core-module";
-import defaultStorage from './default-storage'
+import defaultStorage from './default-storage';
+import defaultClient from './default-client';
 
 const retryCodes = [408, 500, 502, 503, 504, 522, 524]
 
@@ -32,7 +32,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     this.timeout = timeout || 5000
     this.retries = retries || 3
     this.backoff = backoff || 300
-    this.client = client || ((...args) => fetch(...args))
+    this.client = client || defaultClient
   }
 
   async login({ email, password, keepLogged = false }) {
