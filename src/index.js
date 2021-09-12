@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { RbAuthProvider, errors } from "rb-core-module";
+import defaultStorage from './default-storage'
 
 const retryCodes = [408, 500, 502, 503, 504, 522, 524]
 
@@ -12,10 +13,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     identifier = null,
     tenantIdentifier = null,
     acl = null,
-    storage = {
-      local: null,
-      session: null
-    },
+    storage = defaultStorage,
     timeout = 5000,
     retries = 3,
     backoff = 300,
@@ -30,8 +28,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     this.identifier = identifier
     this.tenantIdentifier = tenantIdentifier
     this.acl = acl
-    this.localStorage = storage.local
-    this.sessionStorage = storage.session
+    this.storage = storage || defaultStorage
     this.timeout = timeout || 5000
     this.retries = retries || 3
     this.backoff = backoff || 300
@@ -43,8 +40,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 
   async logout() {
-    this.sessionStorage && this.sessionStorage.removeItem(this.tokenCacheKey)
-    this.localStorage && this.localStorage.removeItem(this.tokenCacheKey)
+    this.storage && this.storage.removeItem(this.tokenCacheKey)
   }
 
   async checkAuth() {
@@ -133,19 +129,12 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 
   _storeTokenToCache (token, keepLogged) {
-    if (keepLogged) {
-      this.localStorage && this.localStorage.setItem(this.tokenCacheKey, token)
-    } else {
-      this.sessionStorage && this.sessionStorage.setItem(this.tokenCacheKey, token)
-    }
+    this.storage && this.storage.setItem(this.tokenCacheKey, token, keepLogged)
   }
 
   _getTokenFromCache () {
-    let token = this.localStorage && this.localStorage.getItem(this.tokenCacheKey)
-    const keepLogged = !!token
-    if (!token) {
-      token = this.sessionStorage && this.sessionStorage.getItem(this.tokenCacheKey)
-    }
+    const token = this.storage && this.storage.getItem(this.tokenCacheKey)
+    const keepLogged = this.storage && this.storage.isItemPersistent(this.tokenCacheKey)
     return { token, keepLogged }
   }
 }

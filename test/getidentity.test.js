@@ -4,19 +4,17 @@ import createAuthProvider from '../src/index'
 function mockStorage () {
   const _storage = {}
   return {
-    setItem: (key, val) => { _storage[key] = val },
-    getItem: (key) => _storage[key],
-    removeItem: (key) => { delete _storage[key] }
+    setItem: (key, val, persistent) => { _storage[key] = { val, persistent } },
+    getItem: (key) => _storage[key] && _storage[key].val,
+    removeItem: (key) => { delete _storage[key] },
+    isItemPersistent: (key) => _storage[key] && _storage[key].persistent,
   }
 }
 
 function createAuthTestProvider (opts) {
   return createAuthProvider({
     ...opts,
-    storage: {
-      local: mockStorage(),
-      session: mockStorage()
-    }
+    storage: mockStorage(),
   })
 }
 

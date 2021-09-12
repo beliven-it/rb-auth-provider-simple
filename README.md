@@ -55,20 +55,20 @@ const authProvider = simpleAuthProvider('https://my.api.url/auth', {
 })
 ```
 
-| Name               | Description                                                    | Default         |
-|--------------------|----------------------------------------------------------------|-----------------|
-| `checkURL`         | The (optional) URL used to check for active authentication     | null            |
-| `userKey`          | The key used to store the user details in the API response     | `user`          |
-| `tokenKey`         | The key used to store the token in the API response            | `token`         |
-| `tokenCacheKey`    | The key used to store the bearer token into the cache storage  | `rb-auth-token` |
-| `identifier`       | A function returning the `user` string representation          | null            |
-| `tenantIdentifier` | A function returning the `user`'s tenant string representation | null            |
-| `acl`              | A function checking if `user` is allowed to visit `route`      | null            |
-| `storage`          | An object with `local` and `session` storage instances         | {}              |
-| `timeout`          | The timeout (ms) for each single HTTP request attempt          | 5000            |
-| `retries`          | The number of attempts before failing                          | 3               |
-| `backoff`          | The incremental delay (ms) between request attempts            | 300             |
-| `client`           | The HTTP client used to perform the requests                   | `fetch`         |
+| Name               | Description                                                    | Default          |
+|--------------------|----------------------------------------------------------------|------------------|
+| `checkURL`         | The (optional) URL used to check for active authentication     | null             |
+| `userKey`          | The key used to store the user details in the API response     | `user`           |
+| `tokenKey`         | The key used to store the token in the API response            | `token`          |
+| `tokenCacheKey`    | The key used to store the bearer token into the cache storage  | `rb-auth-token`  |
+| `identifier`       | A function returning the `user` string representation          | null             |
+| `tenantIdentifier` | A function returning the `user`'s tenant string representation | null             |
+| `acl`              | A function checking if `user` is allowed to visit `route`      | null             |
+| `storage`          | An object implementing the `RbStorage` interface               | `defaultStorage` |
+| `timeout`          | The timeout (ms) for each single HTTP request attempt          | 5000             |
+| `retries`          | The number of attempts before failing                          | 3                |
+| `backoff`          | The incremental delay (ms) between request attempts            | 300              |
+| `client`           | The HTTP client used to perform the requests                   | `fetch`          |
 
 ## Test
 
