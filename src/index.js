@@ -28,7 +28,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     this.identifier = identifier
     this.tenantIdentifier = tenantIdentifier
     this.acl = acl
-    this.storage = storage || defaultStorage
+    this.storage = storage
     this.timeout = timeout || 5000
     this.retries = retries || 3
     this.backoff = backoff || 300
@@ -44,7 +44,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 
   async checkAuth() {
-    const { token, keepLogged } = this._getTokenFromCache()
+    const { token, keepLogged } = await this._getTokenFromCache()
     return this._performAuth(this.checkURL, keepLogged, token)
   }
 
@@ -122,19 +122,24 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     }, this.retries)
     const user = res[this.userKey]
     const token = res[this.tokenKey]
-    this._storeTokenToCache(token, keepLogged)
+    await this._storeTokenToCache(token, keepLogged)
     return {
       data: user
     }
   }
 
-  _storeTokenToCache (token, keepLogged) {
-    this.storage && this.storage.setItem(this.tokenCacheKey, token, keepLogged)
+  async _storeTokenToCache (token, keepLogged) {
+    if (this.storage) {
+      await this.storage.setItem(this.tokenCacheKey, token, keepLogged)
+    }
   }
 
-  _getTokenFromCache () {
-    const token = this.storage && this.storage.getItem(this.tokenCacheKey)
-    const keepLogged = this.storage && this.storage.isItemPersistent(this.tokenCacheKey)
+  async _getTokenFromCache () {
+    if (!this.storage) {
+      return { token: null, keepLogged: false }
+    }
+    const token = await this.storage.getItem(this.tokenCacheKey)
+    const keepLogged = await this.storage.isItemPersistent(this.tokenCacheKey)
     return { token, keepLogged }
   }
 }

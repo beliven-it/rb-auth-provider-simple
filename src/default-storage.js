@@ -1,7 +1,7 @@
 import { RbStorage } from "rb-core-module";
 
 export class DefaultStorage extends RbStorage {
-  getItem (key) {
+  async getItem (key) {
     let res = localStorage.getItem(key)
     if (!res) {
       res = sessionStorage.getItem(key)
@@ -9,7 +9,7 @@ export class DefaultStorage extends RbStorage {
     return res
   }
 
-  setItem (key, val, persistent) {
+  async setItem (key, val, persistent) {
     if (persistent) {
       localStorage.setItem(key, val)
     } else {
@@ -17,12 +17,12 @@ export class DefaultStorage extends RbStorage {
     }
   }
 
-  removeItem (key) {
+  async removeItem (key) {
     localStorage.removeItem(key)
     sessionStorage.removeItem(key)
   }
 
-  isItemPersistent (key) {
+  async isItemPersistent (key) {
     const res = localStorage.getItem(key)
     return !!res
   }
