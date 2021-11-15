@@ -16,10 +16,13 @@ authProvider.login({ email: 'a@a.it', password: 'password' })
 
 ## Schema
 
-Calling `login` will call the provided authentication API as a `POST` request
-with the following payload:
+Invoking `login` will call the provided authentication API as a `POST` request
+with the passed credentials (except for the `keepLogged` attribute which is
+used internally):
 
 ```js
+// e.g. login({ email = '...', password = '...', keepLogged = true })
+//      will produce the following request payload:
 {
   email: '...',
   password: '...'

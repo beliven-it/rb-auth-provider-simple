@@ -1,25 +1,28 @@
-import { RbAuthProvider, errors } from "rb-core-module";
-import defaultStorage from './default-storage';
-import defaultClient from './default-client';
+import { RbAuthProvider, errors } from 'rb-core-module'
+import defaultStorage from './default-storage'
+import defaultClient from './default-client'
 
 const retryCodes = [408, 500, 502, 503, 504, 522, 524]
 
 class RbSimpleAuthProvider extends RbAuthProvider {
-  constructor(authURL, {
-    checkURL = null,
-    userKey = 'user',
-    tokenKey = 'token',
-    tokenCacheKey = 'rb-auth-token',
-    identifier = null,
-    tenantIdentifier = null,
-    acl = null,
-    storage = defaultStorage,
-    timeout = 5000,
-    retries = 3,
-    backoff = 300,
-    client = null
-  } = {}) {
-    super();
+  constructor (
+    authURL,
+    {
+      checkURL = null,
+      userKey = 'user',
+      tokenKey = 'token',
+      tokenCacheKey = 'rb-auth-token',
+      identifier = null,
+      tenantIdentifier = null,
+      acl = null,
+      storage = defaultStorage,
+      timeout = 5000,
+      retries = 3,
+      backoff = 300,
+      client = null
+    } = {}
+  ) {
+    super()
     this.authURL = authURL
     this.checkURL = checkURL || authURL
     this.userKey = userKey
@@ -35,34 +38,34 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     this.client = client || defaultClient
   }
 
-  async login({ email, password, keepLogged = false }) {
-    return this._performAuth(this.authURL, keepLogged, { email, password })
+  async login ({ keepLogged = false, ...credentials }) {
+    return this._performAuth(this.authURL, keepLogged, credentials)
   }
 
-  async logout() {
+  async logout () {
     this.storage && this.storage.removeItem(this.tokenCacheKey)
   }
 
-  async checkAuth() {
+  async checkAuth () {
     const { token, keepLogged } = await this._getTokenFromCache()
     return this._performAuth(this.checkURL, keepLogged, token)
   }
 
-  async getIdentity(user = {}) {
+  async getIdentity (user = {}) {
     if (this.identifier) {
       return this.identifier(user)
     }
     return user.email || ''
   }
 
-  async getTenantIdentity(user = {}) {
+  async getTenantIdentity (user = {}) {
     if (this.tenantIdentifier) {
       return this.tenantIdentifier(user)
     }
     return null
   }
 
-  async can(user, route) {
+  async can (user, route) {
     if (!user) {
       throw new Error(errors.ERR_UNAUTHORIZED)
     }
@@ -92,7 +95,12 @@ class RbSimpleAuthProvider extends RbAuthProvider {
         return new Promise((resolve, reject) => {
           setTimeout(async () => {
             try {
-              const res = await this._performRequest(url, options, retries - 1, _backoff * 2)
+              const res = await this._performRequest(
+                url,
+                options,
+                retries - 1,
+                _backoff * 2
+              )
               resolve(res)
             } catch (err) {
               reject(err)
@@ -110,16 +118,20 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     if (!tokenOrCredentials) {
       throw new Error(errors.ERR_UNAUTHORIZED)
     }
-    const isBearerToken = (typeof tokenOrCredentials === 'string')
+    const isBearerToken = typeof tokenOrCredentials === 'string'
     const headers = {
       Authorization: isBearerToken ? `Bearer ${tokenOrCredentials}` : undefined
     }
     const body = !isBearerToken && tokenOrCredentials
-    const res = await this._performRequest(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body || {})
-    }, this.retries)
+    const res = await this._performRequest(
+      url,
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body || {})
+      },
+      this.retries
+    )
     const user = res[this.userKey]
     const token = res[this.tokenKey]
     await this._storeTokenToCache(token, keepLogged)
@@ -144,8 +156,8 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 }
 
-function createAuthProvider(authURL, opts) {
-  return new RbSimpleAuthProvider(authURL, opts);
+function createAuthProvider (authURL, opts) {
+  return new RbSimpleAuthProvider(authURL, opts)
 }
 
-export default createAuthProvider;
+export default createAuthProvider
