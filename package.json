@@ -1,6 +1,6 @@
 {
   "name": "rb-auth-provider-simple",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "A Restboard auth provider supporting email/password or bearer token",
   "main": "src/index.js",
   "scripts": {
@@ -10,14 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/restboard/rb-auth-provider-simple.git"
   },
-  "keywords": [
-    "REST",
-    "JSON",
-    "auth",
-    "provider",
-    "simple",
-    "restboard"
-  ],
+  "keywords": ["REST", "JSON", "auth", "provider", "simple", "restboard"],
   "author": "Emanuele Bertoldi <emanuele.bertoldi@gmail.com>",
   "license": "MIT",
   "bugs": {
