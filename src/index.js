@@ -119,8 +119,9 @@ class RbSimpleAuthProvider extends RbAuthProvider {
       throw new Error(errors.ERR_UNAUTHORIZED)
     }
     const isBearerToken = typeof tokenOrCredentials === 'string'
-    const headers = {
-      Authorization: isBearerToken ? `Bearer ${tokenOrCredentials}` : undefined
+    const headers = {}
+    if (isBearerToken) {
+      headers['Authorization'] = `Bearer ${tokenOrCredentials}`
     }
     const body = !isBearerToken && tokenOrCredentials
     const res = await this._performRequest(
