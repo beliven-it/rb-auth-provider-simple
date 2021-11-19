@@ -55,7 +55,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     if (this.identifier) {
       return this.identifier(user)
     }
-    return user.email || ''
+    return user.fullname || user.name || user.username || user.email || ''
   }
 
   async getTenantIdentity (user = {}) {
