@@ -1,6 +1,6 @@
 # rb-auth-provider-simple
 
-A [Restboard](https://github.com/restboard/restboard) auth provider supporting email/password or bearer token
+A [Restboard](https://restboard.github.io/) auth provider supporting email/password or bearer token
 
 ## Getting started
 
