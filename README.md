@@ -66,7 +66,7 @@ const authProvider = simpleAuthProvider('https://my.api.url/auth', {
 | `tokenCacheKey`    | The key used to store the bearer token into the cache storage  | `rb-auth-token`  |
 | `identifier`       | A function returning the `user` string representation          | null             |
 | `tenantIdentifier` | A function returning the `user`'s tenant string representation | null             |
-| `acl`              | A function checking if `user` is allowed to visit `route`      | null             |
+| `acl(user, action, subject)` | A function to check if `user` is allowed to perform `action` on `subject` | null |
 | `storage`          | An object implementing the `RbStorage` interface               | `local/session`  |
 | `timeout`          | The timeout (ms) for each single HTTP request attempt          | 5000             |
 | `retries`          | The number of attempts before failing                          | 3                |

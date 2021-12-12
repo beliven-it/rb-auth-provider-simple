@@ -65,15 +65,15 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     return null
   }
 
-  async can (user, route) {
+  async can (user, action, subject) {
     if (!user) {
       throw new Error(errors.ERR_UNAUTHORIZED)
     }
-    if (!route) {
-      throw new Error(errors.ERR_INVALID_ROUTE)
+    if (!action) {
+      throw new Error(errors.ERR_INVALID_ACTION)
     }
     if (this.acl) {
-      const isAuthorized = await this.acl(user, route)
+      const isAuthorized = await this.acl(user, action, subject)
       if (!isAuthorized) {
         throw new Error(errors.ERR_FORBIDDEN)
       }
