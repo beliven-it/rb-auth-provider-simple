@@ -64,14 +64,16 @@ const authProvider = simpleAuthProvider('https://my.api.url/auth', {
 | `userKey`          | The key used to store the user details in the API response     | `user`           |
 | `tokenKey`         | The key used to store the token in the API response            | `token`          |
 | `tokenCacheKey`    | The key used to store the bearer token into the cache storage  | `rb-auth-token`  |
-| `identifier`       | A function returning the `user` string representation          | null             |
+| `userIdentifier`       | A function returning the `user` string representation          | null             |
 | `tenantIdentifier` | A function returning the `user`'s tenant string representation | null             |
 | `acl(user, action, subject)` | A function to check if `user` is allowed to perform `action` on `subject` | null |
-| `storage`          | An object implementing the `RbStorage` interface               | `local/session`  |
 | `timeout`          | The timeout (ms) for each single HTTP request attempt          | 5000             |
 | `retries`          | The number of attempts before failing                          | 3                |
 | `backoff`          | The incremental delay (ms) between request attempts            | 300              |
 | `client`           | The HTTP client used to perform the requests                   | `cross-fetch`    |
+| `writeToStorage`          | A function used to store a session value. Should have the following signature: `async (key, val, persistent) => void`. *Default: using `local/sessionStorage`* |
+| `readFromStorage`          | A function used to read a session value. Should have the following signature: `async (key) => [val, persistent]`. *Default: using `local/sessionStorage`* |
+| `removeFromStorage`          | A function used to remove a session value. Should have the following signature: `async (key) => void`. *Default: using `local/sessionStorage`* |
 
 ## Test
 

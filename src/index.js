@@ -1,8 +1,6 @@
 import { RbAuthProvider, errors } from 'rb-core-module'
-import defaultStorage from './default-storage'
-import defaultClient from './default-client'
-
-const retryCodes = [408, 500, 502, 503, 504, 522, 524]
+import { defaultClient, retryCodes } from './http'
+import { writeToStorage, readFromStorage, removeFromStorage } from './storage'
 
 class RbSimpleAuthProvider extends RbAuthProvider {
   constructor (
@@ -12,14 +10,16 @@ class RbSimpleAuthProvider extends RbAuthProvider {
       userKey = 'user',
       tokenKey = 'token',
       tokenCacheKey = 'rb-auth-token',
-      identifier = null,
+      userIdentifier = null,
       tenantIdentifier = null,
       acl = null,
-      storage = defaultStorage,
       timeout = 5000,
       retries = 3,
       backoff = 300,
-      client = null
+      client = null,
+      writeToStorage,
+      readFromStorage,
+      removeFromStorage
     } = {}
   ) {
     super()
@@ -28,14 +28,16 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     this.userKey = userKey
     this.tokenKey = tokenKey
     this.tokenCacheKey = tokenCacheKey
-    this.identifier = identifier
+    this.userIdentifier = userIdentifier
     this.tenantIdentifier = tenantIdentifier
     this.acl = acl
-    this.storage = storage
     this.timeout = timeout || 5000
     this.retries = retries || 3
     this.backoff = backoff || 300
     this.client = client || defaultClient
+    this.writeToStorage = writeToStorage
+    this.readFromStorage = readFromStorage
+    this.removeFromStorage = removeFromStorage
   }
 
   async login ({ keepLogged = false, ...credentials }) {
@@ -43,7 +45,9 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 
   async logout () {
-    this.storage && this.storage.removeItem(this.tokenCacheKey)
+    if (this.removeFromStorage) {
+      await this.removeFromStorage(this.tokenCacheKey)
+    }
   }
 
   async checkAuth () {
@@ -52,8 +56,8 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 
   async getIdentity (user = {}) {
-    if (this.identifier) {
-      return this.identifier(user)
+    if (this.userIdentifier) {
+      return this.userIdentifier(user)
     }
     return user.fullname || user.name || user.username || user.email || ''
   }
@@ -142,17 +146,16 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   }
 
   async _storeTokenToCache (token, keepLogged) {
-    if (this.storage) {
-      await this.storage.setItem(this.tokenCacheKey, token, keepLogged)
+    if (this.writeToStorage) {
+      await this.writeToStorage(this.tokenCacheKey, token, keepLogged)
     }
   }
 
   async _getTokenFromCache () {
-    if (!this.storage) {
+    if (!this.readFromStorage) {
       return { token: null, keepLogged: false }
     }
-    const token = await this.storage.getItem(this.tokenCacheKey)
-    const keepLogged = await this.storage.isItemPersistent(this.tokenCacheKey)
+    const [token, keepLogged] = await this.readFromStorage(this.tokenCacheKey)
     return { token, keepLogged }
   }
 }
