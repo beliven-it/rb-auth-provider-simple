@@ -1,22 +1,22 @@
 import { RbAuthProvider, errors } from 'rb-core-module'
 import { defaultClient, retryCodes } from './http'
-import { writeToStorage, readFromStorage, removeFromStorage } from './storage'
+import storage from './storage'
 
 class RbSimpleAuthProvider extends RbAuthProvider {
   constructor (
     authURL,
     {
-      checkURL = null,
-      userKey = 'user',
-      tokenKey = 'token',
-      tokenCacheKey = 'rb-auth-token',
-      userIdentifier = null,
-      tenantIdentifier = null,
-      acl = null,
-      timeout = 5000,
-      retries = 3,
-      backoff = 300,
-      client = null,
+      checkURL,
+      userKey,
+      tokenKey,
+      tokenCacheKey,
+      userIdentifier,
+      tenantIdentifier,
+      acl,
+      timeout,
+      retries,
+      backoff,
+      client,
       writeToStorage,
       readFromStorage,
       removeFromStorage
@@ -25,9 +25,9 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     super()
     this.authURL = authURL
     this.checkURL = checkURL || authURL
-    this.userKey = userKey
-    this.tokenKey = tokenKey
-    this.tokenCacheKey = tokenCacheKey
+    this.userKey = userKey || 'user'
+    this.tokenKey = tokenKey || 'token'
+    this.tokenCacheKey = tokenCacheKey || 'rb-auth-token'
     this.userIdentifier = userIdentifier
     this.tenantIdentifier = tenantIdentifier
     this.acl = acl
@@ -35,9 +35,9 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     this.retries = retries || 3
     this.backoff = backoff || 300
     this.client = client || defaultClient
-    this.writeToStorage = writeToStorage
-    this.readFromStorage = readFromStorage
-    this.removeFromStorage = removeFromStorage
+    this.writeToStorage = writeToStorage || storage.writeToStorage
+    this.readFromStorage = readFromStorage || storage.readFromStorage
+    this.removeFromStorage = removeFromStorage || storage.removeFromStorage
   }
 
   async login ({ keepLogged = false, ...credentials }) {
