@@ -1,14 +1,14 @@
-import fetch from 'cross-fetch'
+import fetch from "cross-fetch";
 
-export const retryCodes = [408, 500, 502, 503, 504, 522, 524]
+export const retryCodes = [408, 500, 502, 503, 504, 522, 524];
 
-export function defaultClient (url, opts) {
+export function defaultClient(url, opts) {
   return fetch(url, {
-    credentials: 'include',
+    credentials: "include",
     ...opts,
     headers: {
-      Accept: 'application/json',
-      ...opts.headers
-    }
-  })
+      Accept: "application/json",
+      ...opts.headers,
+    },
+  });
 }
