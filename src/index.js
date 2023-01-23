@@ -7,8 +7,8 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     authURL,
     {
       checkURL,
-      userKey,
-      tokenKey,
+      parseUserDetails,
+      parseToken,
       tokenCacheKey,
       userIdentifier,
       tenantIdentifier,
@@ -25,8 +25,8 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     super();
     this.authURL = authURL;
     this.checkURL = checkURL || authURL;
-    this.userKey = userKey || "user";
-    this.tokenKey = tokenKey || "token";
+    this.parseUserDetails = parseUserDetails || (res => res.user);
+    this.parseToken = parseToken || (res => res.token);
     this.tokenCacheKey = tokenCacheKey || "rb-auth-token";
     this.userIdentifier = userIdentifier;
     this.tenantIdentifier = tenantIdentifier;
@@ -137,8 +137,8 @@ class RbSimpleAuthProvider extends RbAuthProvider {
       },
       this.retries
     );
-    const user = res[this.userKey];
-    const token = res[this.tokenKey];
+    const user = this.parseUserDetails(res);
+    const token = this.parseToken(res);
     await this._storeTokenToCache(token, keepLogged);
     return {
       data: user,
