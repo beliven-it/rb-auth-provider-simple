@@ -5,9 +5,9 @@ A [Restboard](https://restboard.github.io/) auth provider supporting email/passw
 ## Getting started
 
 ```js
-import simpleAuthProvider from 'rb-auth-provider-simple'
+import createAuthProvider from 'rb-auth-provider-simple'
 
-const authProvider = simpleAuthProvider('https://my.api.url/auth')
+const authProvider = createAuthProvider('https://my.api.url/auth')
 
 authProvider.login({ email: 'a@a.it', password: 'password' })
   .then(res => console.log(`Welcome, ${authProvider.getIdentity(res.data)}`))
@@ -47,13 +47,13 @@ By default, a single string argument containing the URL of the authentication
 API to call on login can be passed to the factory function:
 
 ```js
-const authProvider = simpleAuthProvider('https://my.api.url/auth')
+const authProvider = createAuthProvider('https://my.api.url/auth')
 ```
 
 Additional options can be passed as second argument, e.g.:
 
 ```js
-const authProvider = simpleAuthProvider('https://my.api.url/auth', {
+const authProvider = createAuthProvider('https://my.api.url/auth', {
   tokenCacheKey: 'my-auth-token-cache-key'
 })
 ```
@@ -74,6 +74,31 @@ const authProvider = simpleAuthProvider('https://my.api.url/auth', {
 | `writeToStorage`          | A function used to store a session value. Should have the following signature: `async (key, val, persistent) => void` | *using `local/sessionStorage`* |
 | `readFromStorage`          | A function used to read a session value. Should have the following signature: `async (key) => [val, persistent]` | *using `local/sessionStorage`* |
 | `removeFromStorage`          | A function used to remove a session value. Should have the following signature: `async (key) => void` | *using `local/sessionStorage`* |
+
+## CORS issues
+
+If you encounter any CORS issue when using the provider, please keep in mind the default HTTP client is configured to [include credentials](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#sending_a_request_with_credentials_included) for both same-origin and cross-origin requests.
+
+If the server is configured to allow any origin (`Access-Control-Allow-Origin: *`), a CORS error
+will be thrown.
+
+You can solve this issue overriding the default HTTP client adjusting its configuration, e.g.:
+
+```js
+const myClient(url, opts) {
+  return fetch(url, {
+    ...opts,
+    headers: {
+      Accept: "application/json",
+      ...opts.headers,
+    },
+  });
+}
+
+const authProvider = createAuthProvider('https://my.api.url/auth', {
+  client: myClient
+})
+```
 
 ## Test
 
