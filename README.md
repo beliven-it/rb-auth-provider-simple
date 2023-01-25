@@ -72,7 +72,7 @@ const authProvider = createAuthProvider('https://my.api.url/auth', {
 | `backoff`          | The incremental delay (ms) between request attempts            | 300              |
 | `client`           | The HTTP client used to perform the requests                   | `cross-fetch`    |
 | `writeToStorage`          | A function used to store a session value. Should have the following signature: `async (key, val, persistent) => void` | *using `local/sessionStorage`* |
-| `readFromStorage`          | A function used to read a session value. Should have the following signature: `async (key) => [val, persistent]` | *using `local/sessionStorage`* |
+| `readFromStorage`          | A function used to read a session value. Should have the following signature: `async (key) => { value, persistent }` | *using `local/sessionStorage`* |
 | `removeFromStorage`          | A function used to remove a session value. Should have the following signature: `async (key) => void` | *using `local/sessionStorage`* |
 
 ## CORS issues

@@ -1,12 +1,16 @@
 const isBrowserStorageDefined =
   typeof localStorage !== "undefined" && typeof sessionStorage !== "undefined";
 
-// Return the [value, is_persistent] pair
-// for the given key in the storage
+// Return the { value, persistent} object for the given key in the storage
 export async function readFromStorage(key) {
-  if (!isBrowserStorageDefined) return [null, false];
+  if (!isBrowserStorageDefined) {
+    return { value: null, persistent: false };
+  }
   const res = localStorage.getItem(key);
-  return res ? [res, true] : [sessionStorage.getItem(key), false];
+  return {
+    value: res || sessionStorage.getItem(key),
+    permanent: !!res
+  };
 }
 
 export async function writeToStorage(key, val, persistent) {

@@ -155,7 +155,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     if (!this.readFromStorage) {
       return { token: null, keepLogged: false };
     }
-    const [token, keepLogged] = await this.readFromStorage(this.tokenCacheKey);
+    const { value: token, persistent: keepLogged } = await this.readFromStorage(this.tokenCacheKey);
     return { token, keepLogged };
   }
 }
