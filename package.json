@@ -1,6 +1,6 @@
 {
   "name": "rb-auth-provider-simple",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "A Restboard auth provider supporting email/password or bearer token",
   "main": "src/index.js",
   "type": "module",
@@ -26,6 +26,6 @@
   },
   "devDependencies": {
     "eslint": "^8.31.0",
-    "tap": "^16.3.2"
+    "tap": "^16.3.4"
   }
 }
