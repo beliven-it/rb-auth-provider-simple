@@ -5,13 +5,20 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "test": "tap --no-coverage"
+    "test": "tap --disable-coverage --exclude=test/server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/restboard/rb-auth-provider-simple.git"
   },
-  "keywords": ["REST", "JSON", "auth", "provider", "simple", "restboard"],
+  "keywords": [
+    "REST",
+    "JSON",
+    "auth",
+    "provider",
+    "simple",
+    "restboard"
+  ],
   "author": "Emanuele Bertoldi <emanuele.bertoldi@gmail.com>",
   "license": "MIT",
   "bugs": {
@@ -26,6 +33,6 @@
   },
   "devDependencies": {
     "eslint": "^8.48.0",
-    "tap": "^16.3.8"
+    "tap": "^18.6.1"
   }
 }

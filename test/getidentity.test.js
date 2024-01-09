@@ -1,4 +1,4 @@
-import * as t from "tap";
+import t from "tap";
 import createAuthProvider from "../src/index.js";
 
 t.test("getIdentity", async (t) => {
