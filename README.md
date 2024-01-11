@@ -2,6 +2,8 @@
 
 A [Restboard](https://restboard.github.io/) auth provider supporting email/password or bearer token
 
+[![Node.js CI](https://github.com/restboard/rb-auth-provider-simple/actions/workflows/node.js.yml/badge.svg)](https://github.com/restboard/rb-auth-provider-simple/actions/workflows/node.js.yml)
+
 ## Getting started
 
 ```js
