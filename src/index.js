@@ -6,6 +6,8 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   constructor(
     authURL,
     {
+      recoverURL,
+      activateOrResetURL,
       checkURL,
       parseUserDetails,
       parseToken,
@@ -24,9 +26,11 @@ class RbSimpleAuthProvider extends RbAuthProvider {
   ) {
     super();
     this.authURL = authURL;
+    this.recoverURL = recoverURL || authURL;
+    this.activateOrResetURL = activateOrResetURL || authURL;
     this.checkURL = checkURL || authURL;
-    this.parseUserDetails = parseUserDetails || (res => res.user);
-    this.parseToken = parseToken || (res => res.token);
+    this.parseUserDetails = parseUserDetails || ((res) => res.user);
+    this.parseToken = parseToken || ((res) => res.token);
     this.tokenCacheKey = tokenCacheKey || "rb-auth-token";
     this.userIdentifier = userIdentifier;
     this.tenantIdentifier = tenantIdentifier;
@@ -50,6 +54,28 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     }
   }
 
+  async recoverCredentials(challenge) {
+    await this._performRequest(
+      this.recoverURL,
+      {
+        method: "POST",
+        body: JSON.stringify(challenge || {}),
+      },
+      this.retries
+    );
+  }
+
+  async activateOrResetCredentials(payload) {
+    await this._performRequest(
+      this.activateOrResetURL,
+      {
+        method: "POST",
+        body: JSON.stringify(payload || {}),
+      },
+      this.retries
+    );
+  }
+
   async checkAuth() {
     const { token, keepLogged } = await this._getTokenFromCache();
     return this._performAuth(this.checkURL, keepLogged, token);
@@ -69,19 +95,17 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     return null;
   }
 
-  async can(user, action, subject) {
+  can(user, action, subject) {
     if (!user) {
       throw new Error(errors.ERR_UNAUTHORIZED);
     }
     if (!action) {
       throw new Error(errors.ERR_INVALID_ACTION);
     }
-    if (this.acl) {
-      const isAuthorized = await this.acl(user, action, subject);
-      if (!isAuthorized) {
-        throw new Error(errors.ERR_FORBIDDEN);
-      }
+    if (this.acl && !this.acl(user, action, subject)) {
+      throw new Error(errors.ERR_FORBIDDEN);
     }
+    return true;
   }
 
   async _performRequest(url, options, retries, backoff) {
@@ -155,7 +179,9 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     if (!this.readFromStorage) {
       return { token: null, keepLogged: false };
     }
-    const { value: token, persistent: keepLogged } = await this.readFromStorage(this.tokenCacheKey);
+    const { value: token, persistent: keepLogged } = await this.readFromStorage(
+      this.tokenCacheKey
+    );
     return { token, keepLogged };
   }
 }

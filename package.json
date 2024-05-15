@@ -29,7 +29,7 @@
     "cross-fetch": "^4.0.0"
   },
   "peerDependencies": {
-    "rb-core-module": "^0.31.0"
+    "rb-core-module": "^0.32.0"
   },
   "devDependencies": {
     "eslint": "^8.48.0",
