@@ -10,6 +10,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
       activateOrResetURL,
       checkURL,
       parseUserDetails,
+      parseError,
       parseToken,
       tokenCacheKey,
       userIdentifier,
@@ -30,6 +31,7 @@ class RbSimpleAuthProvider extends RbAuthProvider {
     this.activateOrResetURL = activateOrResetURL || authURL;
     this.checkURL = checkURL || authURL;
     this.parseUserDetails = parseUserDetails || ((res) => res.user);
+    this.parseError = parseError || ((res) => res?.statusText || res?.status);
     this.parseToken = parseToken || ((res) => res.token);
     this.tokenCacheKey = tokenCacheKey || "rb-auth-token";
     this.userIdentifier = userIdentifier;
@@ -110,36 +112,37 @@ class RbSimpleAuthProvider extends RbAuthProvider {
 
   async _performRequest(url, options, retries, backoff) {
     const _backoff = backoff || this.backoff;
-    const res = await this.client(url, {
+    const _reqOpts = {
       timeout: this.timeout,
       ...options,
       headers: {
         "Content-Type": "application/json; charset=UTF-8",
         ...options.headers,
       },
-    });
-    if (!res.ok) {
-      if (retries > 1 && retryCodes.includes(res.status)) {
-        return new Promise((resolve, reject) => {
-          setTimeout(async () => {
-            try {
-              const res = await this._performRequest(
-                url,
-                options,
-                retries - 1,
-                _backoff * 2
-              );
-              resolve(res);
-            } catch (err) {
-              reject(err);
-            }
-          }, _backoff);
-        });
-      } else {
-        throw new Error(res.statusText);
+    };
+
+    const req = this.client(url, _reqOpts).then((res) => {
+      if (res.ok) {
+        return res.json();
       }
-    }
-    return res.json();
+      return new Promise((resolve, reject) => {
+        if (retries > 1 && retryCodes.includes(res.status)) {
+          // Retry on failure
+          const retryRequest = () => {
+            this._performRequest(url, options, retries - 1, _backoff * 2)
+              .then(resolve)
+              .catch(reject);
+          };
+          setTimeout(retryRequest, _backoff);
+        } else {
+          // Handle final error
+          const err = this.parseError(res);
+          return !err?.then ? reject(err) : err.then(reject).catch(reject);
+        }
+      });
+    });
+
+    return req;
   }
 
   async _performAuth(url, keepLogged, tokenOrCredentials = null) {

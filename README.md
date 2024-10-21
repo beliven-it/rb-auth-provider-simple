@@ -66,6 +66,7 @@ const authProvider = createAuthProvider('https://my.api.url/auth', {
 | `activateOrResetURL`  | The (optional) URL used to activate or reset user credentials  | null |
 | `checkURL`            | The (optional) URL used to check for active authentication     | null             |
 | `parseUserDetails`    | A function used to extract user details from the API response. Should have the following signature: `(res) => object` | `(res) => res.user` |
+| `parseError`          | A function used to extract details from an API error response. Should have the following signature: `(res) => object\|string` | `(res) => res?.statusText \|\| res?.status` |
 | `parseToken`          | A function used to extract the access token from the API response. Should have the following signature: `(res) => string` | `(res) => res.token` |
 | `tokenCacheKey`       | The key used to store the bearer token into the cache storage  | `rb-auth-token`  |
 | `userIdentifier`      | A function returning the `user` string representation          | null             |
