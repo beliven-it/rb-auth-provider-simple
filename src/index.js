@@ -1,4 +1,4 @@
-import { errors, RbAuthProvider } from "rb-core-module";
+import { errors, RbAuthProvider } from "@beliven/rb-core-module";
 import { defaultClient, retryCodes } from "./http.js";
 import storage from "./storage.js";
 

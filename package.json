@@ -1,5 +1,5 @@
 {
-  "name": "rb-auth-provider-simple",
+  "name": "@beliven/rb-auth-provider-simple",
   "version": "0.23.0",
   "description": "A Restboard auth provider supporting email/password or bearer token",
   "main": "src/index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/restboard/rb-auth-provider-simple.git"
+    "url": "git+https://github.com/beliven-it/rb-auth-provider-simple.git"
   },
   "keywords": [
     "REST",
@@ -22,14 +22,14 @@
   "author": "Emanuele Bertoldi <emanuele.bertoldi@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/restboard/rb-auth-provider-simple/issues"
+    "url": "https://github.com/beliven-it/rb-auth-provider-simple/issues"
   },
-  "homepage": "https://github.com/restboard/rb-auth-provider-simple#readme",
+  "homepage": "https://github.com/beliven-it/rb-auth-provider-simple#readme",
   "dependencies": {
     "cross-fetch": "^4.0.0"
   },
   "peerDependencies": {
-    "rb-core-module": "^0.32.0"
+    "@beliven/rb-core-module": "^0.32.0"
   },
   "devDependencies": {
     "eslint": "^8.48.0",

@@ -2,12 +2,12 @@
 
 A [Restboard](https://restboard.github.io/) auth provider supporting email/password or bearer token
 
-[![Node.js CI](https://github.com/restboard/rb-auth-provider-simple/actions/workflows/node.js.yml/badge.svg)](https://github.com/restboard/rb-auth-provider-simple/actions/workflows/node.js.yml)
+[![Node.js CI](https://github.com/beliven-it/rb-auth-provider-simple/actions/workflows/node.js.yml/badge.svg)](https://github.com/beliven-it/rb-auth-provider-simple/actions/workflows/node.js.yml)
 
 ## Getting started
 
 ```js
-import createAuthProvider from 'rb-auth-provider-simple'
+import createAuthProvider from '@beliven/rb-auth-provider-simple'
 
 const authProvider = createAuthProvider('https://my.api.url/auth')
 
