@@ -121,7 +121,7 @@ If you want, you can also freely donate to fund the project development:
 
 Please open a new issue on:
 
-<https://github.com/restboard/rb-auth-provider-simple/issues>
+<https://github.com/beliven-it/rb-auth-provider-simple/issues>
 
 ## License
 
